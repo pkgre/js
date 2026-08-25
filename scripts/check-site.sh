@@ -6,6 +6,7 @@ if (( $# != 1 )); then
   exit 2
 fi
 
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 site="${1%/}"
 if [[ ! -d "$site" || -L "$site" ]]; then
   echo "site must be a real directory: $site" >&2
@@ -40,7 +41,7 @@ while IFS= read -r -d '' path; do
   fi
 done < <(find "$site" -mindepth 1 -print0)
 
-expected_files=$'.nojekyll\nindex.html\norigin-health/v1.txt'
+expected_files=$'.nojekyll\nindex.html\nnonproduction/redirect-marker-fixture-v0/index.html\norigin-health/v1.txt'
 actual_files="$(find "$site" -type f -printf '%P\n' | LC_ALL=C sort)"
 if [[ "$actual_files" != "$expected_files" ]]; then
   echo "unexpected artifact file set:" >&2
@@ -66,3 +67,12 @@ trap 'rm -f -- "$expected_canary"' EXIT
 printf 'pkgre-origin js v1\n' > "$expected_canary"
 cmp -- "$expected_canary" "$site/origin-health/v1.txt"
 [[ "$(wc -c < "$site/origin-health/v1.txt")" -eq 19 ]]
+
+fixture="$repo/fixtures/nonproduction-redirect-marker-v0"
+[[ -f "$fixture/canonical.html" && ! -L "$fixture/canonical.html" ]]
+[[ "$(stat -c '%a' -- "$fixture/canonical.html")" == 644 ]]
+(
+  cd "$fixture"
+  sha256sum --check --status --strict canonical.sha256
+)
+cmp -- "$fixture/canonical.html" "$site/nonproduction/redirect-marker-fixture-v0/index.html"
