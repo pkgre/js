@@ -1,0 +1,18 @@
+{
+  "catalogSha256": "b92834fb5571e00c01c389f776ba1e4749ab11be8b64f7ee5beaa8a34507fafc",
+  "metadata": [],
+  "objects": [
+    {
+      "path": "packages/07e3bbe05bffd0994601324a6519621dd93c6990e9350b04019c8366942207e3.tgz",
+      "sha256": "07e3bbe05bffd0994601324a6519621dd93c6990e9350b04019c8366942207e3"
+    }
+  ],
+  "routes": [
+    {
+      "path": "v1/js/main/07e3bbe05bffd0994601324a6519621dd93c6990e9350b04019c8366942207e3",
+      "sha256": "86a9005390094d14eb9411bfb1351b349b5dd94486b5dee541b6f6bd7a802e7c"
+    }
+  ],
+  "schema": "pkgre-js-site-v1",
+  "stage": "routes"
+}
