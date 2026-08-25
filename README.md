@@ -1,6 +1,6 @@
 # js.pkg.re
 
-Status:unpublished bootstrap for the curated JavaScript package registry;current artifact is only the default GitHub Pages origin at `https://pkgre.github.io/js/`,not a usable package registry.
+Status:default GitHub Pages origin published at `https://pkgre.github.io/js/`;custom domain remains unset;artifact is not yet a usable package registry.
 
 ## Artifact
 
@@ -15,9 +15,9 @@ Build+validate:`./scripts/build-site.sh`;security+reproducibility cases:`./scrip
 
 Expected Pages responses:`index.html`+fixture=`Content-Type:text/html` (normally `charset=utf-8`);canary=`Content-Type:text/plain` (normally `charset=utf-8`);all=`200` with GitHub-controlled validators/cache policy (currently commonly `Cache-Control:max-age=600`). Correctness checks must compare exact body bytes and must not depend on a stable cache header.
 
-## Publication gate
+## Publication state
 
-Publication+Pages settings are operator-only. Review local commits;keep Pages custom domain empty;enable GitHub Actions as the Pages source if required;push `main`. The workflow validates pull requests/manual runs but uploads+deploys only on a push to `main`. Do not add `CNAME` or configure `js.pkg.re` before the bounded first-issuance experiment.
+GitHub Actions is the Pages source;pushes to `main` validate+deploy the default project origin. Keep Pages custom domain empty;do not add `CNAME` or configure `js.pkg.re` before the bounded first-issuance experiment.
 
 Post-publication checks:
 
