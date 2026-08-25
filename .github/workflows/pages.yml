@@ -23,7 +23,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Build and validate site
-        run: ./scripts/build-site.sh
+        run: ./scripts/test-site.sh
       - name: Require source tree stability
         run: git diff --exit-code
       - name: Configure GitHub Pages

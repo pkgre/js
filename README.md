@@ -11,7 +11,7 @@ Status:unpublished bootstrap for the curated JavaScript package registry;current
 | `site-src/origin-health/v1.txt` | `/origin-health/v1.txt` | Exact bytes `pkgre-origin js v1\n`;19 bytes. |
 | `fixtures/nonproduction-redirect-marker-v0/canonical.html` | `/nonproduction/redirect-marker-fixture-v0/index.html` | Digest-pinned probe only;not production marker-v1 and not an archive route. |
 
-Build+validate:`./scripts/build-site.sh`;output:`_site/`;dependencies:Bash+GNU coreutils+findutils+grep. The validator allows only regular files/directories,canonical path characters,modes `0644`/`0755`,the fixed file set,exact canary/fixture bytes,no `CNAME`,and no common secret forms.
+Build+validate:`./scripts/build-site.sh`;security+reproducibility cases:`./scripts/test-site.sh`;output:`_site/`;dependencies:Bash+GNU coreutils+findutils+grep. The validator allows only regular files/directories,canonical path characters,modes `0644`/`0755`,the fixed file set,exact canary/fixture bytes,no `CNAME`,and no common secret forms.
 
 Expected Pages responses:`index.html`+fixture=`Content-Type:text/html` (normally `charset=utf-8`);canary=`Content-Type:text/plain` (normally `charset=utf-8`);all=`200` with GitHub-controlled validators/cache policy (currently commonly `Cache-Control:max-age=600`). Correctness checks must compare exact body bytes and must not depend on a stable cache header.
 
