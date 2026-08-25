@@ -1,6 +1,6 @@
 # js.pkg.re
 
-Status:default GitHub Pages origin published at `https://pkgre.github.io/js/`;custom domain remains unset;artifact is not yet a usable package registry.
+Status:default GitHub Pages origin published at `https://pkgre.github.io/js/`;reviewed `C0` bootstrap stored dormant under `bootstrap/js-v0.1.0/`;custom domain remains unset;published artifact is not yet a usable package registry.
 
 ## Artifact
 
@@ -14,6 +14,12 @@ Status:default GitHub Pages origin published at `https://pkgre.github.io/js/`;cu
 Build+validate:`./scripts/build-site.sh`;security+reproducibility cases:`./scripts/test-site.sh`;output:`_site/`;dependencies:Bash+GNU coreutils+findutils+grep. The validator allows only regular files/directories,canonical path characters,modes `0644`/`0755`,the fixed file set,exact canary/fixture bytes,no `CNAME`,and no common secret forms.
 
 Expected Pages responses:`index.html`+fixture=`Content-Type:text/html` (normally `charset=utf-8`);canary=`Content-Type:text/plain` (normally `charset=utf-8`);all=`200` with GitHub-controlled validators/cache policy (currently commonly `Cache-Control:max-age=600`). Correctness checks must compare exact body bytes and must not depend on a stable cache header.
+
+## Dormant bootstrap
+
+`bootstrap/js-v0.1.0/` contains reviewed canonical catalog+archive+previous/routes/final site stages for initial closure `{pkgre-js@0.1.0}`. These files are evidence+future activation inputs only:`scripts/build-site.sh` never reads `bootstrap/`,and `scripts/check-site.sh` continues to require exactly the four inert files above. `./scripts/check-bootstrap.sh [PKGRE_SOURCE_REPOSITORY]` binds the annotated source tag+commit,pinned Node/npm,repacked archive,full checksums,indexer semantics,two deterministic monotonic render stages,and current inert Pages output.
+
+Activation remains two-stage after P3/P6 operator evidence:publish routes+object,read back and wait the measured cache horizon,then publish metadata. Never publish `site-final/` directly.
 
 ## Publication state
 
