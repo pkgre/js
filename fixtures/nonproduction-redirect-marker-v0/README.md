@@ -1,1 +1,0 @@
-The `canonical.html` bytes are an intentionally nonproduction static-origin probe. Namespace+marker name differ from the future production `redirect-marker-v1` protocol;destination is not an npm archive path;no package metadata may reference this fixture.
