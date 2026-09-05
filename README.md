@@ -1,39 +1,15 @@
 # js.pkg.re
 
-Status:default GitHub Pages origin published at `https://pkgre.github.io/js/`;reviewed `C0` bootstrap stored dormant under `bootstrap/js-v0.1.0/`;custom domain remains unset;published artifact is not yet a usable package registry.
-
-## Artifact
-
-| Source | Published path | Contract |
-|---|---|---|
-| `site-src/.nojekyll` | `/.nojekyll` | Disable Jekyll processing. |
-| `site-src/index.html` | `/index.html` | Static landing page;no script/style. |
-| `site-src/origin-health/v1.txt` | `/origin-health/v1.txt` | Exact bytes `pkgre-origin js v1\n`;19 bytes. |
-| `fixtures/nonproduction-redirect-marker-v0/canonical.html` | `/nonproduction/redirect-marker-fixture-v0/index.html` | Digest-pinned probe only;not production marker-v1 and not an archive route. |
-
-Build+validate:`./scripts/build-site.sh`;security+reproducibility cases:`./scripts/test-site.sh`;output:`_site/`;dependencies:Bash+GNU coreutils+findutils+grep. The validator allows only regular files/directories,canonical path characters,modes `0644`/`0755`,the fixed file set,exact canary/fixture bytes,no `CNAME`,and no common secret forms.
-
-Expected Pages responses:`index.html`+fixture=`Content-Type:text/html` (normally `charset=utf-8`);canary=`Content-Type:text/plain` (normally `charset=utf-8`);all=`200` with GitHub-controlled validators/cache policy (currently commonly `Cache-Control:max-age=600`). Correctness checks must compare exact body bytes and must not depend on a stable cache header.
+Status:native dynamic serving live at `https://js.pkg.re/` (`pkgre-js-serve` on rain;D7 deployed+validated 2026-09-05);GitHub Pages origin retired;reviewed `C0` bootstrap retained under `bootstrap/js-v0.1.0/` as evidence+activation input.
 
 ## Dormant bootstrap
 
-`bootstrap/js-v0.1.0/` contains reviewed canonical catalog+archive+previous/routes/final site stages for initial closure `{pkgre-js@0.1.0}`. These files are evidence+future activation inputs only:`scripts/build-site.sh` never reads `bootstrap/`,and `scripts/check-site.sh` continues to require exactly the four inert files above. `./scripts/check-bootstrap.sh [PKGRE_SOURCE_REPOSITORY]` binds the annotated source tag+commit,pinned Node/npm,repacked archive,full checksums,indexer semantics,two deterministic monotonic render stages,and current inert Pages output.
+`bootstrap/js-v0.1.0/` contains the reviewed canonical catalog+archive+previous/routes/final site stages for initial closure `{pkgre-js@0.1.0}`. It is the serving input for the js watcher (`bootstrap/js-v0.1.0/catalog.json`) and the content-pinned archive store;it must stay byte-identical. `./scripts/check-bootstrap.sh [PKGRE_SOURCE_REPOSITORY]` binds the annotated source tag+commit,pinned Node/npm,repacked archive,full checksums,indexer semantics,and both deterministic monotonic render stages. CI runs it on every push/PR against pkgre/pkgre pinned at `066293df` (`js/v0.1.0`).
 
-Activation remains two-stage after P3/P6 operator evidence:publish routes+object,read back and wait the measured cache horizon,then publish metadata. Never publish `site-final/` directly.
+## Serving
 
-## Publication state
-
-GitHub Actions is the Pages source;pushes to `main` validate+deploy the default project origin. Keep Pages custom domain empty;do not add `CNAME` or configure `js.pkg.re` before the bounded first-issuance experiment.
-
-Post-publication checks:
-
-```sh
-curl --fail --silent --show-error https://pkgre.github.io/js/origin-health/v1.txt | cmp - site-src/origin-health/v1.txt
-gh api repos/pkgre/js/pages --jq '{html_url,cname,https_enforced,source,status}'
-```
-
-Required result:default project URL serves exact canary bytes;Pages API `cname` is empty/null. Custom-domain,DNS,and Rain deployment steps belong to later operator handoffs.
+`pkgre-js-serve` (pkgre/pkgre monorepo,`js/src/serve/`) materializes the catalog from this repository's `main` branch and serves packuments+bodies in body-delivery mode. New tarballs require an infra archive-store pin update before the watcher accepts the new catalog (snapshot fails closed;runbook §9).
 
 ## License
 
-Curator-authored catalog metadata,fixtures,tooling,and documentation:Apache-2.0. Future retained package archives keep each package's own license;inclusion does not relicense them.
+Curator-authored catalog metadata,tooling,and documentation:Apache-2.0. Retained package archives keep each package's own license;inclusion does not relicense them.

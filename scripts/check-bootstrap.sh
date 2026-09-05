@@ -155,8 +155,4 @@ for run in a b; do
   cmp -- "$tmp/site-final.manifest" "$tmp/site-final-$run.manifest"
 done
 
-"$repo/scripts/build-site.sh"
-manifest "$repo/_site" > "$tmp/current-site.manifest"
-cmp -- "$tmp/site-previous.manifest" "$tmp/current-site.manifest"
-"$repo/scripts/check-site.sh" "$repo/_site"
-printf 'ok bootstrap=js-v0.1.0 tag=%s commit=%s archive=%s catalog=%s pages=inert\n' "$tag_object" "$commit" "$archive_sha256" "$catalog_sha256"
+printf 'ok bootstrap=js-v0.1.0 tag=%s commit=%s archive=%s catalog=%s\n' "$tag_object" "$commit" "$archive_sha256" "$catalog_sha256"
