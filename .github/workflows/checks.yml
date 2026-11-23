@@ -1,0 +1,146 @@
+name: Check pull request
+
+# The workflow, the scripts it runs and the tooling pin are this file's on the
+# default branch: pull_request_target always takes them from there. The pull
+# request's tree is fetched by its commit hash as data and never run.
+on:
+  pull_request_target:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-pull-request-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  bootstrap:
+    name: Dormant bootstrap
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: main
+          persist-credentials: false
+      - name: Require the checked-out main
+        run: |
+          head="$(git -C main rev-parse HEAD)"
+          if [[ "$head" != "$GITHUB_SHA" ]]; then
+            echo "the checked-out main is $head, not $GITHUB_SHA" >&2
+            exit 1
+          fi
+      - name: Check out pinned indexer source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: pkgre/pkgre
+          ref: 066293df21743cbf41fb571a38f2bb94059e7274
+          fetch-depth: 0
+          path: .verification/pkgre
+          persist-credentials: false
+      - name: Require the pin on pkgre/pkgre main
+        env:
+          PIN: 066293df21743cbf41fb571a38f2bb94059e7274
+        run: |
+          base="$(git -C .verification/pkgre rev-parse --verify refs/remotes/origin/main)" || {
+            echo 'the pinned source has no origin/main' >&2
+            exit 1
+          }
+          if ! git -C .verification/pkgre merge-base --is-ancestor "$PIN" "$base"; then
+            echo "the pin $PIN is not on pkgre/pkgre main" >&2
+            exit 1
+          fi
+      - name: Install Nix
+        uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+      - name: Fetch the pull request's tree as data
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./main/scripts/fetch-candidate.sh
+      - name: Validate dormant bootstrap
+        run: ./main/scripts/check-bootstrap.sh "$GITHUB_WORKSPACE/.verification/pkgre" "$GITHUB_WORKSPACE/candidate"
+      - name: Require source tree stability
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_ATTR_NOSYSTEM: "1"
+        run: |
+          changes="$(git -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null \
+            -c protocol.allow=never -c protocol.https.allow=always \
+            -C candidate status --porcelain=v1 --untracked-files=all --ignored)"
+          if [[ -n "$changes" ]]; then
+            printf '%s\n' "$changes" >&2
+            echo 'the checks changed the candidate tree' >&2
+            exit 1
+          fi
+  served-catalog:
+    name: Served catalog
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: main
+          persist-credentials: false
+      - name: Require the checked-out main
+        run: |
+          head="$(git -C main rev-parse HEAD)"
+          if [[ "$head" != "$GITHUB_SHA" ]]; then
+            echo "the checked-out main is $head, not $GITHUB_SHA" >&2
+            exit 1
+          fi
+      - name: Check out pinned indexer
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: pkgre/pkgre
+          ref: 99c0b3086a68186150f9d59c56fedf061ba3e114
+          fetch-depth: 0
+          path: tooling
+          persist-credentials: false
+      - name: Require the pin on pkgre/pkgre main
+        env:
+          PIN: 99c0b3086a68186150f9d59c56fedf061ba3e114
+        run: |
+          base="$(git -C tooling rev-parse --verify refs/remotes/origin/main)" || {
+            echo 'the pinned indexer has no origin/main' >&2
+            exit 1
+          }
+          if ! git -C tooling merge-base --is-ancestor "$PIN" "$base"; then
+            echo "the pin $PIN is not on pkgre/pkgre main" >&2
+            exit 1
+          fi
+      - name: Install Nix
+        uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
+      - name: Build pinned indexer
+        run: nix build --print-build-logs ./tooling#js
+      - name: Fetch the pull request's tree as data
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./main/scripts/fetch-candidate.sh
+      - name: Check the served catalog and archives
+        run: ./result/bin/pkgre-js check candidate/bootstrap/js-v0.1.0/catalog.json candidate/bootstrap/js-v0.1.0/archives
+  catalog-checks:
+    name: Catalog checks
+    needs: [bootstrap, served-catalog]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Require every check
+        env:
+          BOOTSTRAP: ${{ needs.bootstrap.result }}
+          SERVED_CATALOG: ${{ needs.served-catalog.result }}
+        run: |
+          if [[ "$BOOTSTRAP" != success ]]; then
+            echo "Dormant bootstrap: $BOOTSTRAP" >&2
+            exit 1
+          fi
+          if [[ "$SERVED_CATALOG" != success ]]; then
+            echo "Served catalog: $SERVED_CATALOG" >&2
+            exit 1
+          fi

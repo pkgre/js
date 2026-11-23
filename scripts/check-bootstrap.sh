@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if (( $# > 1 )); then
-  echo "usage: $0 [PKGRE_SOURCE_REPOSITORY]" >&2
+if (( $# > 2 )) || [[ $# == 2 && -z "$2" ]]; then
+  echo "usage: $0 [PKGRE_SOURCE_REPOSITORY [CATALOG_REPOSITORY]]" >&2
   exit 2
 fi
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-release="$repo/bootstrap/js-v0.1.0"
+catalog_repo="${2-$repo}"
+release="$catalog_repo/bootstrap/js-v0.1.0"
 source_repo="${1:-$repo/../pkgre}"
 tag=js/v0.1.0
 tag_object=ba2ace0c3efd55160b79a620f3ec548305fa7b34
