@@ -1,4 +1,4 @@
-# pkgre-js 0.1.0 dormant bootstrap
+# pkgre-js 0.1.0 Dormant bootstrap
 
 Status:reviewed offline `C0` artifact;not a Pages input;production metadata,marker,object,and route publication remains blocked on P3 certificate-issuance+P6 Rain-frontend operator evidence.
 
